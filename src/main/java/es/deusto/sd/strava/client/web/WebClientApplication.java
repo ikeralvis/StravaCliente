@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
  */
 
 // Anotar el motivo de la ubicación.
-@SpringBootApplication(scanBasePackages = {"es.deusto.sd.auctions"})
+@SpringBootApplication(scanBasePackages = {"es.deusto.sd.strava"})
 public class WebClientApplication {
 
     public static void main(String[] args) {

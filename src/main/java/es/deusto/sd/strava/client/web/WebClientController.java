@@ -76,7 +76,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class WebClientController {
 
 	@Autowired
-	private IStravaServiceProxy stravaServiceProxy;
+	private IAuctionsServiceProxy auctionsServiceProxy;
 
 	private String token; // Stores the session token
 

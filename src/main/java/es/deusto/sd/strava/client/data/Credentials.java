@@ -5,4 +5,4 @@
  */
 package es.deusto.sd.strava.client.data;
 
-public record Credenciales(String email, String password) {}
+public record Credentials(String email, String password) {}
