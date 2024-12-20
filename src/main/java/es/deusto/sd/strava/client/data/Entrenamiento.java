@@ -5,4 +5,14 @@
  */
 package es.deusto.sd.strava.client.data;
 
-public record Credentials(String email, String password) {}
+import java.time.LocalDate;
+
+
+public record Entrenamiento(
+	    String titulo,
+	    String deporte,
+	    float distancia,
+		LocalDate fechaInicio,
+		String horaInicio,
+	    int duracion
+	) {}

@@ -5,11 +5,17 @@
  */
 package es.deusto.sd.strava.client.proxies;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale.Category;
+import java.util.Map;
 
-import es.deusto.sd.strava.client.data.Article;
-import es.deusto.sd.strava.client.data.Category;
-import es.deusto.sd.strava.client.data.Credentials;
+import es.deusto.sd.strava.client.data.Credenciales;
+import es.deusto.sd.strava.client.data.Entrenamiento;
+import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.TokenPorID;
+import es.deusto.sd.strava.client.data.Usuario;
+
 
 /**
  * IAuctionsServiceProxy interface defines a contract for communication 
@@ -38,22 +44,15 @@ import es.deusto.sd.strava.client.data.Credentials;
  * 
  * (Description generated with ChatGPT 4o mini)
  */
-public interface IAuctionsServiceProxy {
-	// Method for user login
-	String login(Credentials credentials);
-
-	// Method for user logout
+public interface IStravaServiceProxy {
+	void registrar(Usuario usuario);
 	void logout(String token);
-
-	// Method to retrieve all categories
-	List<Category> getAllCategories();
-
-	// Method to retrieve articles by category name
-	List<Article> getArticlesByCategory(String categoryName, String currency);
-
-	// Method to get details of a specific article by ID
-	Article getArticleDetails(Long articleId, String currency);
-
-	// Method to place a bid on an article
-	void makeBid(Long articleId, Float amount, String currency, String token);
+	TokenPorID login(Credenciales credenciales);
+	List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin);
+	void anadirEntrenamiento(String token, Entrenamiento entrenamiento);
+	void anadirReto(String token, Entrenamiento entrenamiento);
+	List<Reto> consultarRetos(String token, LocalDate fechaInicio, LocalDate fechaFin, String deporte);	
+	void aceptarReto(String token, Reto reto);
+	Map<Integer, Double> consultarRetosUsuario(String token);
+	
 }

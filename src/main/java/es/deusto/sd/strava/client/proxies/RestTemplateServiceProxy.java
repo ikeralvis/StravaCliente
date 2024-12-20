@@ -5,16 +5,18 @@
  */
 package es.deusto.sd.strava.client.proxies;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.ldap.embedded.EmbeddedLdapProperties.Credential;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import es.deusto.sd.strava.client.data.Article;
-import es.deusto.sd.strava.client.data.Category;
-import es.deusto.sd.strava.client.data.Credentials;
+import es.deusto.sd.strava.client.data.Credenciales;
+import es.deusto.sd.strava.client.data.Entrenamiento;
+import es.deusto.sd.strava.client.data.TokenPorID;
 
 /**
  * RestTemplateServiceProxy class is an implementation of the Service Proxy design pattern.
@@ -44,7 +46,7 @@ import es.deusto.sd.strava.client.data.Credentials;
  * (Description generated with ChatGPT 4o mini)
  */
 @Service
-public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
+public class RestTemplateServiceProxy implements IStravaServiceProxy{
 
     private final RestTemplate restTemplate;
 
@@ -56,11 +58,11 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
     }
 
     @Override
-    public String login(Credentials credentials) {
+    public TokenPorID login(Credenciales credentials) {
         String url = apiBaseUrl + "/auth/login";
         
         try {
-            return restTemplate.postForObject(url, credentials, String.class);
+            return restTemplate.postForObject(url, credentials, TokenPorID.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401 -> throw new RuntimeException("Login failed: Invalid credentials.");
@@ -85,34 +87,24 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Category> getAllCategories() {
-        String url = apiBaseUrl + "/auctions/categories";
-        
-        try {
-            return restTemplate.getForObject(url, List.class);
-        } catch (HttpStatusCodeException e) {
-            switch (e.getStatusCode().value()) {
-                case 404 -> throw new RuntimeException("No categories found.");
-                default -> throw new RuntimeException("Failed to retrieve categories: " + e.getStatusText());
-            }
-        }
+    public List<Entrenamiento> consultarEntrenamientos(String userToken, LocalDate fechaInicio, LocalDate fechaFin) {
+    	String url = String.format("%s/strava/users/%d/trainings?userToken=%s%s%s", 
+                apiBaseUrl,
+                userToken,
+                fechaInicio != null ? "&FechaInicio=" + fechaInicio : "",
+                fechaFin != null ? "&FechaFin=" + fechaFin : "");
+    	try {
+    		return restTemplate.getForObject(url, List.class);
+    		
+    	} catch (HttpStatusCodeException e) {
+    		switch (e.getStatusCode().value()) {
+    		case 401: throw new RuntimeException("Credenciales incorrectas");
+    		default: throw new RuntimeException("Error al recuperar los entrenamientos");
+    		}
+    	}
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Article> getArticlesByCategory(String categoryName, String currency) {
-        String url = apiBaseUrl + "/auctions/categories/" + categoryName + "/articles?currency=" + currency;
-        
-        try {
-            return restTemplate.getForObject(url, List.class);
-        } catch (HttpStatusCodeException e) {
-            switch (e.getStatusCode().value()) {
-                case 404 -> throw new RuntimeException("Category not found: " + categoryName);
-                case 400 -> throw new RuntimeException("Invalid currency: " + currency);
-                default -> throw new RuntimeException("Failed to retrieve articles: " + e.getStatusText());
-            }
-        }
-    }
+    
 
     @Override
     public Article getArticleDetails(Long articleId, String currency) {
