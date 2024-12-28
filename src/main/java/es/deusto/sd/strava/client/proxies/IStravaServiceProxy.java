@@ -46,13 +46,16 @@ import es.deusto.sd.strava.client.data.Usuario;
 public interface IStravaServiceProxy {
 	
 	void registrar(Usuario usuario);
+
 	void logout(String token);
+
 	TokenPorID login(Credentials credenciales);
-	List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin);
-	void anadirEntrenamiento(String token, Entrenamiento entrenamiento);
-	void anadirReto(String token, Entrenamiento entrenamiento);
-	List<Reto> consultarRetos(String token, LocalDate fechaInicio, LocalDate fechaFin, String deporte);	
-	void aceptarReto(String token, Reto reto);
-	Map<Integer, Double> consultarRetosUsuario(String token);
+
+	//List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin);
+	//void anadirEntrenamiento(String token, Entrenamiento entrenamiento);
+	//void anadirReto(String token, Reto reto);
+	//List<Reto> consultarRetos(String token, LocalDate fechaInicio, LocalDate fechaFin, String deporte);	
+	//void aceptarReto(String token, Reto reto);
+	//Map<Integer, Double> consultarRetosUsuario(String token);
 	
 }
