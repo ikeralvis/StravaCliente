@@ -41,7 +41,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
                                usuario.frecuenciaCardiacaReposo());
         
         try {
-            restTemplate.postForObject(url, usuario, Void.class);
+            restTemplate.postForObject(url, null, Void.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 409:
@@ -76,7 +76,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
                 credentials.email(),
                 credentials.password());
         try {
-            return restTemplate.getForObject(url, TokenPorID.class);
+            return restTemplate.postForObject(url, null, TokenPorID.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401:
