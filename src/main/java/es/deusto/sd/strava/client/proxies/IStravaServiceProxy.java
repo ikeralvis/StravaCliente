@@ -51,9 +51,9 @@ public interface IStravaServiceProxy {
 
 	TokenPorID login(Credentials credenciales);
 
-	//List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin);
-	//void anadirEntrenamiento(String token, Entrenamiento entrenamiento);
-	//void anadirReto(String token, Reto reto);
+	List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin);
+	void anadirEntrenamiento(String token, Entrenamiento entrenamiento);
+	void anadirReto(String token, Reto reto);
 	//List<Reto> consultarRetos(String token, LocalDate fechaInicio, LocalDate fechaFin, String deporte);	
 	//void aceptarReto(String token, Reto reto);
 	//Map<Integer, Double> consultarRetosUsuario(String token);

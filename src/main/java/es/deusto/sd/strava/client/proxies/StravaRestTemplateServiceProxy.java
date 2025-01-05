@@ -87,4 +87,22 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
         }
 
     }
+
+    @Override
+    public List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'consultarEntrenamientos'");
+    }
+
+    @Override
+    public void anadirEntrenamiento(String token, Entrenamiento entrenamiento) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'anadirEntrenamiento'");
+    }
+
+    @Override
+    public void anadirReto(String token, Reto reto) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'anadirReto'");
+    }
 }
