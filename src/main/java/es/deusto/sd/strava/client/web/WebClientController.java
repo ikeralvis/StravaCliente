@@ -88,8 +88,8 @@ public class WebClientController {
 		model.addAttribute("token", token); // Makes token available in all templates
 	}
 
-	@GetMapping("/")
-	public String home(Model model) {
+	@GetMapping("/2")
+	public String home2(Model model) {
 		List<Category> categories;
 
 		try {
@@ -102,7 +102,7 @@ public class WebClientController {
 		return "index";
 	}
 
-	@GetMapping("/login")
+	@GetMapping("/login2")
 	public String showLoginPage(@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
 			Model model) {
 		// Add redirectUrl to the model if needed
@@ -111,7 +111,7 @@ public class WebClientController {
 		return "login"; // Return your login template
 	}
 
-	@PostMapping("/login")
+	@PostMapping("/login2")
 	public String performLogin(@RequestParam("email") String email, @RequestParam("password") String password,
 			@RequestParam(value = "redirectUrl", required = false) String redirectUrl, Model model) {
 		Credentials credentials = new Credentials(email, password);
@@ -127,7 +127,7 @@ public class WebClientController {
 		}
 	}
 
-	@GetMapping("/logout")
+	@GetMapping("/logout2")
 	public String performLogout(@RequestParam(value = "redirectUrl", defaultValue = "/") String redirectUrl,
 			Model model) {
 		try {
@@ -142,7 +142,7 @@ public class WebClientController {
 		return "redirect:" + redirectUrl;
 	}
 
-	@GetMapping("/category/{name}")
+	@GetMapping("/category2/{name}")
 	public String getCategoryArticles(@PathVariable("name") String name,
 			@RequestParam(value = "currency", defaultValue = "EUR") String currency, Model model) {
 		List<Article> articles;
@@ -162,7 +162,7 @@ public class WebClientController {
 		return "category";
 	}
 
-	@GetMapping("/article/{id}")
+	@GetMapping("/article2/{id}")
 	public String getArticleDetails(@PathVariable("id") Long id,
 			@RequestParam(value = "currency", defaultValue = "EUR") String currency, Model model) {
 		Article article;
@@ -180,7 +180,7 @@ public class WebClientController {
 		return "article";
 	}
 
-	@PostMapping("/bid")
+	@PostMapping("/bid2")
 	public String makeBid(@RequestParam("id") Long id, @RequestParam("amount") Float amount,
 			@RequestParam(value = "currency", defaultValue = "EUR") String currency, Model model,
 			RedirectAttributes redirectAttributes) {

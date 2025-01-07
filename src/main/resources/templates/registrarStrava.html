@@ -23,7 +23,7 @@
 	<nav class="navbar navbar-expand-lg navbar-dark bg-warning shadow">
 	    <div class="container">
 	        <!-- Back button -->
-	        <a href="/" class="btn btn-dark fw-bold">
+	        <a href="/inicio" class="btn btn-dark fw-bold">
 	            <i class="fas fa-arrow-left me-2"></i> Volver
 	        </a>
 	    </div>
@@ -35,8 +35,8 @@
             <div class="col-md-8 col-lg-6">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <h2 class="text-center text-dark fw-bold mb-4">Introducce tus datos para registrarte en la aplicacion</h2>
-                        <form id="addRegisterForm" th:action="@{'/register'}" method="post">
+                        <h2 class="text-center text-dark fw-bold mb-4">Introduce tus datos para registrarte en la aplicacion</h2>
+                        <form id="addRegisterForm" th:action="@{'/registrarStrava'}" method="post">
                             <!-- Email -->
                             <div class="mb-3">
                                 <label for="email" class="form-label">Correo Electrónico</label>
@@ -49,13 +49,25 @@
                             </div>
                             <!-- Fecha de Nacimiento -->
                             <div class="mb-3">
-                                <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
-                                <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" required>
-                            </div>
-                            <!-- Servidor de Autenticación -->
-                            <div class="mb-3">
-                                <label for="servidorAuth" class="form-label">Tipo de Autenticación </label>
-                                <input type="text" id="tipoLogin" name="tipoLogin" class="form-control" placeholder="Tipo de Autenticación" required>
+								<label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+								<input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" required>
+							</div>
+							<!-- Servidor de Autenticación -->
+							<div class="mb-3"></div>
+								<label class="form-label">Tipo de Autenticación</label>
+								<div class="d-flex justify-content-between">
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="radio" name="tipoLogin" id="tipoLoginGoogle" value="GOOGLE" >
+										<label class="form-check-label" for="tipoLoginGoogle"></label>
+											<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png" alt="Google" style="height: 20px;">
+									</div>
+									<div class="form-check form-check-inline">
+										<input class="form-check-input" type="radio" name="tipoLogin" id="tipoLoginMeta" value="META" >
+										<label class="form-check-label" for="tipoLoginMeta"></label>
+										<img src="https://www.notebookcheck.org/fileadmin/Notebooks/News/_nc4/Meta-Logo.png" alt="Google" style="height: 40px;">
+									</div>
+								</div>
+
                             </div>
                             <!-- Peso -->
                             <div class="mb-3">
@@ -102,65 +114,5 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-	
-	<!-- Form validation -->
-	<script th:inline="javascript">
-		const form = document.getElementById('addRegisterForm');
-		form.addEventListener('submit', function(event) {
-			event.preventDefault();
-			
-
-		    // Obtener datos del formulario
-		    var u = {
-		        email: document.getElementById('email').value,
-		        nombre: document.getElementById('nombre').value,
-		        fechaNacimiento: new Date(document.getElementById('fechaNacimiento').value).getTime(),
-		        tipoLogin: document.getElementById('tipoLogin').value,
-		        peso: parseFloat(document.getElementById('peso').value) || null,
-		        altura: parseInt(document.getElementById('altura').value) || null,
-		        frecuenciaCardiacaMax: parseInt(document.getElementById('frecuenciaCardiacaMax').value) || null,
-		        frecuenciaCardiacaReposo: parseInt(document.getElementById('frecuenciaCardiacaReposo').value) || null
-		    };
-
-		    // Validación de campos
-		    if (!u.email || !u.nombre || !u.fechaNacimiento || !u.servidorAuth) {
-		        alert('Por favor, todos los campos son obligatorios.');
-		        return;
-		    }
-		    // URL
-		    var url = this.action;
-
-		    // Enviar al servidor los datos del usuario
-			console.log('Datos a enviar', u)
-		    fetch(url, {
-		        method: 'POST',
-		        headers: {
-		            'Content-Type': 'application/json',
-		        },
-		        body: JSON.stringify(u)
-		    })
-		    .then(response => {
-		        console.log('Response status:', response.status);
-		        
-		        // Manejar diferentes códigos de estado
-		        if (response.ok) {
-		            alert('Registro exitoso');
-		            window.location.href = '/'; // Redirigir a página de inicio
-		            return;
-		        }
-
-		        // Error en el servidor
-		        return response.text().then(errorText => {
-		            console.error('Error response:', errorText);
-		            throw new Error(errorText || 'Error al registrar el usuario');
-		        });
-		    })
-		    .catch(error => {
-		        console.error('Error completo:', error);
-		        alert('Error al registar el usuario: ' + error.message);
-		    });
-		});
-	</script>
-	
 </body>
 </html>

@@ -7,8 +7,11 @@ package es.deusto.sd.strava.client.web;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.slf4j.Logger;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +32,7 @@ import es.deusto.sd.strava.client.data.TokenPorID;
 import es.deusto.sd.strava.client.data.Usuario;
 import es.deusto.sd.strava.client.proxies.IAuctionsServiceProxy;
 import es.deusto.sd.strava.client.proxies.IStravaServiceProxy;
+import es.deusto.sd.strava.client.proxies.StravaRestTemplateServiceProxy;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -84,7 +88,7 @@ public class StravaWebClientController {
 
 	@Autowired
 	private IStravaServiceProxy stravaServiceProxy;
-
+	private static final Logger logger = LoggerFactory.getLogger(StravaWebClientController.class);
 	private String token; // Stores the session token
 
 	// Add current URL and token to all views
@@ -94,34 +98,60 @@ public class StravaWebClientController {
 		model.addAttribute("currentUrl", currentUrl); // Makes current URL available in all templates
 		model.addAttribute("token", token); // Makes token available in all templates
 	}
+	@GetMapping("/inicio")
+	public String inicio(Model model) {
+		return "inicio";
+	}
 
 	@GetMapping("/")
 	public String home() {
-		return "index";
+		return "indexStrava";
 	}
 
-	@GetMapping("/register")
+	@GetMapping("/registrarStrava")
 	public String showRegister(@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
 			Model model) {
-
-		return "register";
+		return "registrarStrava";
 	}
 
-	@PostMapping("/register")
-	public String performRegister(@RequestBody Usuario u, RedirectAttributes redirectAttributes) {
+	@PostMapping("/registrarStrava")
+	public String performRegister(
+    @RequestParam("nombre") String nombre,
+    @RequestParam("email") String email,
+    @RequestParam(name = "peso", required = false) Float peso,
+    @RequestParam(name = "altura", required = false) Float altura,
+    @RequestParam(name = "fechaNacimiento") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaNacimiento,
+    @RequestParam(name = "frecuenciaCardiacaMax", required = false) Integer frecuenciaCardiacaMax,
+    @RequestParam(name = "frecuenciaCardiacaReposo", required = false) Integer frecuenciaCardiacaReposo,
+    @RequestParam("tipoLogin") String tipoLogin,
+    RedirectAttributes redirectAttributes,
+    Model model) {
 		try {
-			// Llamada al servicio para agregar el entrenamiento
-			stravaServiceProxy.registrar(u);
+			Usuario usuario = new Usuario(
+				nombre,
+				email,
+				peso,
+				altura,
+				fechaNacimiento,
+				frecuenciaCardiacaMax,
+				frecuenciaCardiacaReposo,
+				List.of(), // Lista vacía de entrenamientos (debe inicializarse aparte)
+				List.of(), // Lista vacía de retos aceptados (debe inicializarse aparte)
+				tipoLogin
+			);
+			logger.info("-Controller-\tRegistrando usuario: " + usuario.toString());
+			stravaServiceProxy.registrar(usuario);
 
 			// Si todo va bien, redirigimos a una página de éxito o a la vista de
 			// entrenamiento del usuario
 			redirectAttributes.addFlashAttribute("message", "Usuario registrado exitosamente");
+			logger.info("-Controller-\tUsuario registrado exitosamente");
 			return "index";
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error en el registro");
-			return "errorPage"; // Redirigir a la página del usuario
+			return "errorPage"; 
 		}
 	}
 
@@ -130,8 +160,8 @@ public class StravaWebClientController {
 			Model model) {
 		// Add redirectUrl to the model if needed
 		model.addAttribute("redirectUrl", redirectUrl);
-
-		return "login"; // Return your login template
+		logger.info("-Controller-\tMostrando pagina de login");
+		return "loginStrava"; // Return your login template
 	}
 
 	@PostMapping("/login")
@@ -140,13 +170,16 @@ public class StravaWebClientController {
 		Credentials credentials = new Credentials(email, password);
 
 		try {
-			TokenPorID tokenId = stravaServiceProxy.login(credentials);
-
+			logger.info("-Controller-	Las credenciales para hacer login son: email: " + credentials.email() + " password: "
+					+ credentials.password());
+			String tokenId = stravaServiceProxy.login(credentials);
+			logger.info("-Controller-\tEl token de la sesion es: " + tokenId);
+			token = tokenId; 
 			// Redirect to the original page or root if redirectUrl is null
 			return "redirect:" + (redirectUrl != null && !redirectUrl.isEmpty() ? redirectUrl : "/");
 		} catch (RuntimeException e) {
 			model.addAttribute("errorMessage", "Login failed: " + e.getMessage());
-			return "login"; // Return to login page with error message
+			return "loginStrava"; // Return to login page with error message
 		}
 	}
 
@@ -165,7 +198,7 @@ public class StravaWebClientController {
 		return "redirect:" + redirectUrl;
 	}
 
-	@GetMapping("/usuarios/entrenamientos")
+	@GetMapping("/entrenamientos")
 	public String conseguirEntrenamientosUsuario(
 			@RequestParam(value = "startDate", required = false) LocalDate startDate,
 			@RequestParam(value = "endDate", required = false) LocalDate endDate,
@@ -183,7 +216,7 @@ public class StravaWebClientController {
 			model.addAttribute("startDate", startDate);
 			model.addAttribute("endDate", endDate);
 
-			return "entrenamientos"; // Thymeleaf renderiza "entrenamientos.html"
+			return "entrenamientos"; 
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("errorMessage",

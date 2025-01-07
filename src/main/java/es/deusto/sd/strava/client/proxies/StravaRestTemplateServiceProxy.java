@@ -17,10 +17,15 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 @Service
 public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     private final RestTemplate restTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(StravaRestTemplateServiceProxy.class);
 
     @Value("${api.base.url}")
     private String apiBaseUrl;
@@ -39,7 +44,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
                                usuario.altura(), 
                                usuario.frecuenciaCardiacaMax(), 
                                usuario.frecuenciaCardiacaReposo());
-        
+        logger.info("-RestTemplate- URL: " + url);
         try {
             restTemplate.postForObject(url, null, Void.class);
         } catch (HttpStatusCodeException e) {
@@ -69,19 +74,23 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     }
 
     @Override
-    public TokenPorID login(Credentials credentials) {
+    public String login(Credentials credentials) {
         // Construir la URL con los parámetros
         String url = String.format("%s/auth/login?email=%s&contrasenya=%s",
                 apiBaseUrl,
                 credentials.email(),
                 credentials.password());
+        logger.info("-RestTemplate- URL: " + url);
         try {
-            return restTemplate.postForObject(url, null, TokenPorID.class);
+            logger.info("-RestTemplate-    Procesando login");
+            return restTemplate.postForObject(url, null, String.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401:
-                    throw new RuntimeException("Credenciales inválidas");
+                    logger.error("-RestTemplate-    Credenciales invalidas");
+                    throw new RuntimeException("Credenciales invalidas");
                 default:
+                    logger.error("-RestTemplate-    Login fallido: " + e.getStatusCode().value());
                     throw new RuntimeException("Login fallido: " + e.getStatusCode().value());
             }
         }

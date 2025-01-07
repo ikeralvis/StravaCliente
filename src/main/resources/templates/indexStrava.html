@@ -26,19 +26,11 @@
 		<div class="container">
 			 <!-- Links de navegacion -->
 			 <a href="" class="btn btn-dark fw-bold me-2">Principal</a>
-			 <a href="/users/entrenamientos" class="btn btn-dark fw-bold me-2">Mis entrenamientos</a>
+			 <a href="/entrenamientos" class="btn btn-dark fw-bold me-2">Mis entrenamientos</a>
 			 <a href="/optionRetoSelector" class="btn btn-dark fw-bold me-2">Retos</a>
 
-	        <!-- Login/Logout buttons -->
+	        <!-- Logout button -->
 	        <div class="ms-auto">
-				<a href="/registrar" class="btn btn-outline-dark btn-sm me-2">
-					<i class="fas fa-sign-in-alt me-1"></i> Registrar
-				</a>
-				<div>
-	            	<a th:if="${token == null}" th:href="@{/login(redirectUrl=${currentUrl})}" 
-	               	class="btn btn-primary btn-sm d-flex align-items-center">
-	                <i class="fas fa-sign-in-alt me-2"></i> Login
-	            	</a>
 	            	<a th:if="${token != null}" th:href="@{/logout(redirectUrl=${currentUrl})}" 
 	               	class="btn btn-danger btn-sm d-flex align-items-center ms-2">
 	                <i class="fas fa-sign-out-alt me-2"></i> Logout

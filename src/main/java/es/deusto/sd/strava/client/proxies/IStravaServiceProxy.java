@@ -49,7 +49,7 @@ public interface IStravaServiceProxy {
 
 	void logout(String token);
 
-	TokenPorID login(Credentials credenciales);
+	String login(Credentials credenciales);
 
 	List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin);
 	void anadirEntrenamiento(String token, Entrenamiento entrenamiento);
