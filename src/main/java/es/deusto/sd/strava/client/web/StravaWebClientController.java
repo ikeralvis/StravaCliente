@@ -98,12 +98,12 @@ public class StravaWebClientController {
 		model.addAttribute("currentUrl", currentUrl); // Makes current URL available in all templates
 		model.addAttribute("token", token); // Makes token available in all templates
 	}
-	@GetMapping("/inicio")
+	@GetMapping("/")
 	public String inicio(Model model) {
 		return "inicio";
 	}
 
-	@GetMapping("/")
+	@GetMapping("/index")
 	public String home() {
 		return "indexStrava";
 	}
