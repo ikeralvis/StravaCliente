@@ -36,7 +36,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
 
     @Override
     public void registrar(Usuario usuario) {
-        String url = String.format("%s/registroUsuario?nombre=%s&fechaNacimiento=%s&peso=%f&altura=%f&frecuenciaCardiacaMax=%d&frecuenciaCardiacaReposo=%d", 
+        String url = String.format("%s/auth/registroUsuario?nombre=%s&fechaNacimiento=%s&peso=%f&altura=%f&frecuenciaCardiacaMax=%d&frecuenciaCardiacaReposo=%d", 
                                apiBaseUrl, 
                                usuario.nombre(), 
                                usuario.fechaNacimiento(), 
