@@ -36,6 +36,7 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h2 class="text-center text-dark fw-bold mb-4">Introduce tus datos para registrarte en la aplicacion</h2>
+                        <p th:if="${errorMessage}" th:text="${errorMessage}" class="text-danger mt-3"></p>
                         <form id="addRegisterForm" th:action="@{'/registrarStrava'}" method="post">
                             <!-- Email -->
                             <div class="mb-3">
@@ -72,22 +73,22 @@
                             <!-- Peso -->
                             <div class="mb-3">
                                 <label for="peso" class="form-label">Peso</label>
-                                <input type="number" step="0.1" id="peso" name="peso" class="form-control" placeholder="Ejemplo: 75">
+                                <input type="number" step="0.1" id="peso" name="peso" class="form-control" placeholder="Ejemplo: 75" value="0">
                             </div>
                             <!-- Altura -->
                             <div class="mb-3">
                                 <label for="altura" class="form-label">Altura</label>
-                                <input type="number" id="altura" name="altura" class="form-control" placeholder="Ejemplo: 180">
+                                <input type="number" id="altura" name="altura" class="form-control" placeholder="Ejemplo: 180" value="0">
                             </div>
                             <!-- Frecuencia Cardíaca Máxima -->
                             <div class="mb-3">
                                 <label for="frecuenciaCardiacaMax" class="form-label">Frecuencia Cardíaca Máxima (bpm)</label>
-                                <input type="number" id="frecuenciaCardiacaMax" name="frecuenciaCardiacaMax" class="form-control" placeholder="Ejemplo: 95">
+                                <input type="number" id="frecuenciaCardiacaMax" name="frecuenciaCardiacaMax" class="form-control" placeholder="Ejemplo: 95" value="0">
                             </div>
                             <!-- Frecuencia Cardíaca en Reposo -->
                             <div class="mb-3">
                                 <label for="frecuenciaCardiacaReposo" class="form-label">Frecuencia Cardíaca en Reposo (bpm)</label>
-                                <input type="number" id="frecuenciaCardiacaReposo" name="frecuenciaCardiacaReposo" class="form-control" placeholder="Ejemplo: 45">
+                                <input type="number" id="frecuenciaCardiacaReposo" name="frecuenciaCardiacaReposo" class="form-control" placeholder="Ejemplo: 45" value="0">
                             </div>
                             <!-- Botón de Registro -->
                             <div class="d-grid">

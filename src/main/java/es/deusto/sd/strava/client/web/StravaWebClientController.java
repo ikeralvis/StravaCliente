@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -126,18 +127,18 @@ public class StravaWebClientController {
     @RequestParam("tipoLogin") String tipoLogin,
     RedirectAttributes redirectAttributes,
     Model model) {
+
+
 		try {
 			Usuario usuario = new Usuario(
-				nombre,
-				email,
-				peso,
-				altura,
-				fechaNacimiento,
-				frecuenciaCardiacaMax,
-				frecuenciaCardiacaReposo,
-				List.of(), // Lista vacía de entrenamientos (debe inicializarse aparte)
-				List.of(), // Lista vacía de retos aceptados (debe inicializarse aparte)
-				tipoLogin
+			nombre,
+			email,
+			peso,
+			altura,
+			fechaNacimiento,
+			frecuenciaCardiacaMax,
+			frecuenciaCardiacaReposo,
+			tipoLogin
 			);
 			logger.info("-Controller-\tRegistrando usuario: " + usuario.toString());
 			stravaServiceProxy.registrar(usuario);
@@ -146,13 +147,13 @@ public class StravaWebClientController {
 			// entrenamiento del usuario
 			redirectAttributes.addFlashAttribute("message", "Usuario registrado exitosamente");
 			logger.info("-Controller-\tUsuario registrado exitosamente");
-			return "index";
+			return "indexStrava";
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error en el registro");
-			return "errorPage"; 
-		}
+		} catch (RuntimeException e) {
+				logger.info("-Controller-    Registro fallido: " + e);
+				model.addAttribute("errorMessage", "Registro fallido: "+ e.getMessage());
+				return "registrarStrava";
+			}
 	}
 
 	@GetMapping("/login")
@@ -176,7 +177,7 @@ public class StravaWebClientController {
 			logger.info("-Controller-\tEl token de la sesion es: " + tokenId);
 			token = tokenId; 
 			// Redirect to the original page or root if redirectUrl is null
-			return "redirect:" + (redirectUrl != null && !redirectUrl.isEmpty() ? redirectUrl : "/");
+			return "indexStrava";
 		} catch (RuntimeException e) {
 			model.addAttribute("errorMessage", "Login failed: " + e.getMessage());
 			return "loginStrava"; // Return to login page with error message

@@ -1,19 +1,17 @@
 package es.deusto.sd.strava.client.proxies;
 
-import org.springframework.http.HttpHeaders;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 import es.deusto.sd.strava.client.data.Credentials;
 import es.deusto.sd.strava.client.data.Entrenamiento;
 import es.deusto.sd.strava.client.data.Reto;
-import es.deusto.sd.strava.client.data.TokenPorID;
 import es.deusto.sd.strava.client.data.Usuario;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -35,22 +33,32 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     }
 
     @Override
-    public void registrar(Usuario usuario) {
-        String url = String.format("%s/auth/registroUsuario?nombre=%s&fechaNacimiento=%s&peso=%f&altura=%f&frecuenciaCardiacaMax=%d&frecuenciaCardiacaReposo=%d", 
+    public String registrar(Usuario usuario) {
+        DecimalFormat decimalFormat = new DecimalFormat("0.######", DecimalFormatSymbols.getInstance(Locale.US));
+        String peso = decimalFormat.format(usuario.peso());
+        String altura = decimalFormat.format(usuario.altura());
+
+        String url = String.format("%s/auth/registroUsuario?email=%s&tipoLogin=%s&nombre=%s&fechaNacimiento=%s&peso=%s&altura=%s&frecuenciaCardiacaMax=%d&frecuenciaCardiacaReposo=%d",
                                apiBaseUrl, 
-                               usuario.nombre(), 
-                               usuario.fechaNacimiento(), 
-                               usuario.peso(), 
-                               usuario.altura(), 
-                               usuario.frecuenciaCardiacaMax(), 
-                               usuario.frecuenciaCardiacaReposo());
+                                usuario.email(),
+                                usuario.tipoLogin(),
+                                usuario.nombre(), 
+                                usuario.fechaNacimiento(), 
+                                peso, 
+                                altura, 
+                                usuario.frecuenciaCardiacaMax(), 
+                                usuario.frecuenciaCardiacaReposo());
         logger.info("-RestTemplate- URL: " + url);
         try {
-            restTemplate.postForObject(url, null, Void.class);
+            return restTemplate.postForObject(url, null, String.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 409:
-                    throw new RuntimeException("Usuario ya registrado");
+                    logger.info("-RestTemplate-    Usuario ya registrado");
+                    throw new RuntimeException("Usuario ya registrado: " + e.getStatusCode().value());
+                case 401:
+                    logger.info("-RestTemplate-    La contrasenya o el correo no son correctos");
+                    throw new RuntimeException("La contrasenya o el correo no son correctos: " + e.getStatusCode().value());
                 default:
                     throw new RuntimeException("Registro fallido: " + e.getStatusCode().value());
             }

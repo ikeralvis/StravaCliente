@@ -45,7 +45,7 @@ import es.deusto.sd.strava.client.data.Usuario;
  */
 public interface IStravaServiceProxy {
 	
-	void registrar(Usuario usuario);
+	String registrar(Usuario usuario);
 
 	void logout(String token);
 

@@ -6,17 +6,14 @@
 package es.deusto.sd.strava.client.data;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public record Usuario(
 	String nombre,
 	String email,
-	Float peso,
-	Float altura,
+	float peso,
+	float altura,
 	LocalDate fechaNacimiento,
-	Integer frecuenciaCardiacaMax,
-	Integer frecuenciaCardiacaReposo,
-	List<Entrenamiento> entrenamientos,
-	List<Reto> retosAceptados,
+	int frecuenciaCardiacaMax,
+	int frecuenciaCardiacaReposo,
 	String tipoLogin
 ) {}
