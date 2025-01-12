@@ -227,18 +227,19 @@ public class StravaWebClientController {
 
 	}
 
-	@PostMapping("/entretenamientos")
+	@PostMapping("/anadirEntrenamientos")
 	public String anadirEntrenamientos(
 			@RequestBody Entrenamiento entrenamiento,
 			RedirectAttributes redirectAttributes) {
-
 		try {
 			// Llamada al servicio para agregar el entrenamiento
+			logger.info("-Controller-\tAñadiendo entrenamiento: " + entrenamiento.toString() + " con token: " + token);
 			stravaServiceProxy.anadirEntrenamiento(token, entrenamiento);
+			logger.info("-Controller-\tEntrenamiento añadido exitosamente");
 
 			// Redirigir con un mensaje de éxito
 			redirectAttributes.addFlashAttribute("message", "Entrenamiento agregado exitosamente");
-			return "redirect:/usuarios/entrenamientos"; // Redirigir a la página del usuario
+			return "redirect:/entrenamientos"; // Redirigir a la página del usuario
 
 		} catch (Exception e) {
 			e.printStackTrace();

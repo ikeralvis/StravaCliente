@@ -100,19 +100,36 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
                 default:
                     logger.error("-RestTemplate-    Login fallido: " + e.getStatusCode().value());
                     throw new RuntimeException("Login fallido: " + e.getStatusCode().value());
+            }}}
+
+            
+
+            @Override
+            public List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin) {
+                // Construir la URL con los parámetros
+                String url = String.format("%s/api/entrenamientos/?token=%s%s%s",
+                        apiBaseUrl,
+                        token,
+                        fechaInicio != null ? "&fechaInicio=" + fechaInicio : "",
+                        fechaFin != null ? "&fechaFin=" + fechaFin : "");
+                logger.info("-RestTemplate- URL: " + url);
+                try {
+                    logger.info("-RestTemplate-    Procesando consulta de entrenamientos");
+                    return restTemplate.getForObject(url, List.class);
+                } catch (HttpStatusCodeException e) {
+                    switch (e.getStatusCode().value()) {
+                        case 401:
+                            logger.error("-RestTemplate-    Token inválido");
+                            throw new RuntimeException("Token inválido");
+                        default:
+                            logger.error("-RestTemplate-    Consulta de entrenamientos fallida: " + e.getStatusCode().value());
+                            throw new RuntimeException("Consulta de entrenamientos fallida: " + e.getStatusCode().value());
+                    }
+                }
             }
-        }
 
-    }
-
-    @Override
-    public List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'consultarEntrenamientos'");
-    }
-
-    @Override
-    public void anadirEntrenamiento(String token, Entrenamiento entrenamiento) {
+            @Override
+            public void anadirEntrenamiento(String token, Entrenamiento entrenamiento) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'anadirEntrenamiento'");
     }
