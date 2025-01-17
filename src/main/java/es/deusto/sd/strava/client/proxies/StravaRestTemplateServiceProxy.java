@@ -185,8 +185,46 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     }
 
     @Override
-    public List<Reto> consultarRetos(String token, LocalDate fechaInicio, LocalDate fechaFin, String deporte) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'consultarRetos'");
+    public List<Reto> consultarRetosActivos() {
+        // Construir la URL con String.format en el formato esperado
+        String url = String.format("%s/api/retos", apiBaseUrl);
+        logger.info("-RestTemplate- URL: " + url);
+        try {
+            logger.info("-RestTemplate-    Procesando consulta de retos sin filtrar");
+            List<Reto> retos = restTemplate.getForObject(url, List.class);
+            logger.info("-RestTemplate-    Retos: " + retos);
+            return retos;
+        } catch (HttpStatusCodeException e) {
+            switch (e.getStatusCode().value()) {
+                case 401:
+                    logger.error("-RestTemplate-    Token inválido");
+                    throw new RuntimeException("Token inválido");
+                default:
+                    logger.error("-RestTemplate-    Consulta de retos fallida: " + e.getStatusCode().value());
+                    throw new RuntimeException("Consulta de retos fallida: " + e.getStatusCode().value());
+            }
+        }
+    }
+
+    @Override
+    public List<Reto> consultarRetosActivosFiltrados( String token, LocalDate fechaFin, String deporte) {
+        // Construir la URL con String.format en el formato esperado
+        String url = String.format("%s/api/retos", apiBaseUrl);
+        logger.info("-RestTemplate- URL: " + url);
+        try {
+            logger.info("-RestTemplate-    Procesando consulta de retos sin filtrar");
+            List<Reto> retos = restTemplate.getForObject(url, List.class);
+            logger.info("-RestTemplate-    Retos: " + retos);
+            return retos;
+        } catch (HttpStatusCodeException e) {
+            switch (e.getStatusCode().value()) {
+                case 401:
+                    logger.error("-RestTemplate-    Token inválido");
+                    throw new RuntimeException("Token inválido");
+                default:
+                    logger.error("-RestTemplate-    Consulta de retos fallida: " + e.getStatusCode().value());
+                    throw new RuntimeException("Consulta de retos fallida: " + e.getStatusCode().value());
+            }
+        }
     }
 }

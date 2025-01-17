@@ -287,7 +287,7 @@ public class StravaWebClientController {
 
 		try {
 			// Llama al servicio proxy para obtener los retos del usuario
-			List<Reto> retos = stravaServiceProxy.consultarRetos(token, startDate, endDate, sport);
+			List<Reto> retos = stravaServiceProxy.consultarRetosActivos();
 			// Agrega los retos al modelo para mostrarlos en la vista
 			model.addAttribute("challenges", retos);
 			model.addAttribute("startDate", startDate);
