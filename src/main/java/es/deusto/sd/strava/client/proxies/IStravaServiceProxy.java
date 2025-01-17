@@ -55,7 +55,7 @@ public interface IStravaServiceProxy {
 	void anadirEntrenamiento(String token, Entrenamiento entrenamiento);
 	void anadirReto(String token, Reto reto);
 	//List<Reto> consultarRetos(String token, LocalDate fechaInicio, LocalDate fechaFin, String deporte);	
-	//void aceptarReto(String token, Reto reto);
+	String aceptarReto(String nombreReto, String token);
 	//Map<Integer, Double> consultarRetosUsuario(String token);
 	
 }

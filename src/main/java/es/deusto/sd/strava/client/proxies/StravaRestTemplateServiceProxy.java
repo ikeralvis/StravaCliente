@@ -1,5 +1,6 @@
 package es.deusto.sd.strava.client.proxies;
 
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -13,9 +14,11 @@ import es.deusto.sd.strava.client.data.Reto;
 import es.deusto.sd.strava.client.data.Usuario;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +128,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
         try {
             logger.info("-RestTemplate-    Procesando consulta de entrenamientos");
             List<Entrenamiento> entrenamientos = restTemplate.postForObject(url, null, List.class);
-        return entrenamientos;
+            return entrenamientos;
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401:
@@ -148,5 +151,29 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     public void anadirReto(String token, Reto reto) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'anadirReto'");
+    }
+
+    @Override
+    public String aceptarReto(String nombreReto, String token) {
+        String url = String.format("%s/api/retos/%s/aceptar",
+                apiBaseUrl,
+                nombreReto);
+        logger.info("-RestTemplate- URL: " + url);
+        try {
+            logger.info("-RestTemplate-    Procesando aceptar reto");
+            return restTemplate.postForObject(url, token, String.class);
+
+        } catch (HttpStatusCodeException e) {
+            logger.error("-RestTemplate- Error al aceptar reto: " + e.getStatusCode());
+
+            switch (e.getStatusCode().value()) {
+                case 401:
+                    logger.error("-RestTemplate-    Token inválido");
+                    throw new RuntimeException("Token inválido");
+                default:
+                    logger.error("-RestTemplate-    Aceptar reto fallido: " + e.getStatusCode().value());
+                    throw new RuntimeException("Aceptar reto fallido: " + e.getStatusCode().value());
+            }
+        }
     }
 }
