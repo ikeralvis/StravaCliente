@@ -183,4 +183,10 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
             }
         }
     }
+
+    @Override
+    public List<Reto> consultarRetos(String token, LocalDate fechaInicio, LocalDate fechaFin, String deporte) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'consultarRetos'");
+    }
 }
