@@ -111,22 +111,31 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
 
     @Override
     public List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin) {
+        // Formatear las fechas si no son nulas
+        String fechaInicioParam = (fechaInicio != null) ? fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : null;
+        String fechaFinParam = (fechaFin != null) ? fechaFin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null;
 
-        String url = String.format("%s/api/entrenamientos?token=%s&fechaInicio=%s&fechaFin=%s",
-                apiBaseUrl,
-                token,
-                (fechaInicio != null) ? fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "",
-                (fechaFin != null) ? fechaFin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "");
+        // Construir la URL sin incluir las fechas si son nulas
+        StringBuilder url = new StringBuilder(String.format("%s/api/entrenamientos?token=%s", apiBaseUrl, token));
 
-        logger.info("-RestTemplate- URL: " + url);
+        // Solo agregar los parámetros de fechas si no son nulos
+        if (fechaInicioParam != null) {
+            url.append("&fechaInicio=").append(fechaInicioParam);
+        }
+        if (fechaFinParam != null) {
+            url.append("&fechaFin=").append(fechaFinParam);
+        }
+
+        logger.info("-RestTemplate- URL: " + url.toString());
+
         try {
             logger.info("-RestTemplate-    Procesando consulta de entrenamientos");
-            ParameterizedTypeReference<List<Entrenamiento>> responseType = new ParameterizedTypeReference<>() {
-            };
-            ResponseEntity<List<Entrenamiento>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null,
-                    responseType);
-
-            return responseEntity.getBody();
+            // Realizamos la solicitud al servidor
+            List<Entrenamiento> entrenamientos = restTemplate.exchange(url.toString(), HttpMethod.GET, null,
+                    new ParameterizedTypeReference<List<Entrenamiento>>() {
+                    }).getBody();
+            return entrenamientos;
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401:

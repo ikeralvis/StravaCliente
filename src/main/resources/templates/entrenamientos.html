@@ -66,12 +66,15 @@
                 </tr>
             </thead>
             <tbody>
+                <tr th:if="${#lists.isEmpty(entrenamientos)}">
+                    <td colspan="6" class="text-center">No se encontraron entrenamientos</td>
+                </tr>
                 <tr th:each="entrenamiento : ${entrenamientos}">
                     <td th:text="${entrenamiento.titulo}"></td>
                     <td th:text="${entrenamiento.deporte}"></td>
                     <td th:text="${#numbers.formatDecimal(entrenamiento.distancia, 0, 2, 'POINT')}"></td>
-                    <td th:text="${entrenamiento.fechaInicio}"></td>
-                    <td th:text="${entrenamiento.horaInicio}"></td>
+                    <td th:text="${#temporals.format(entrenamiento.fechaInicio, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(entrenamiento.horaInicio, 'HH:mm')}"></td>
                     <td th:text="${entrenamiento.duracion}"></td>
                 </tr>
             </tbody>

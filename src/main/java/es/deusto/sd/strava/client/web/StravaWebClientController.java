@@ -208,11 +208,13 @@ public class StravaWebClientController {
 
 		try {
 			// Llama al servicio proxy para obtener los entrenamientos del usuario
-			List<Entrenamiento> trainings = stravaServiceProxy.consultarEntrenamientos(token, fechaInicio, fechaFin);
+			List<Entrenamiento> entrenamientos = stravaServiceProxy.consultarEntrenamientos(token, fechaInicio, fechaFin);
+			logger.info("-Controller-\tEntrenamientos obtenidos: " + entrenamientos.size() + " entrenamientos encontrados");
+			model.addAttribute("entrenamientos", entrenamientos);
 			// Agrega los entrenamientos al modelo para mostrarlos en la vista
-			model.addAttribute("trainings", trainings);
-			model.addAttribute("startDate", fechaInicio);
-			model.addAttribute("endDate", fechaFin);
+			model.addAttribute("entrenamientos", entrenamientos);
+			model.addAttribute("fechaInicio", fechaInicio);
+			model.addAttribute("fechaFin", fechaFin);
 
 			return "entrenamientos";
 		} catch (RuntimeException e) {
