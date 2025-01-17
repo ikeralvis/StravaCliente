@@ -1,6 +1,5 @@
 package es.deusto.sd.strava.client.proxies;
 
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -14,11 +13,13 @@ import es.deusto.sd.strava.client.data.Reto;
 import es.deusto.sd.strava.client.data.Usuario;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,25 +111,22 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
 
     @Override
     public List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin) {
-        // Formatear las fechas si no son nulas
-        String fechaInicioParam = (fechaInicio != null) ? fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                : null;
-        String fechaFinParam = (fechaFin != null) ? fechaFin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null;
 
-        // Construir la URL con String.format en el formato esperado
-        String url = String.format(
-                "%s/api/entrenamientos/%s/%s?token=%s&fechaInicio=%s&fechaFin=%s",
-                apiBaseUrl, // Base URL del servidor
-                fechaInicioParam,
-                fechaFinParam,
+        String url = String.format("%s/api/entrenamientos?token=%s&fechaInicio=%s&fechaFin=%s",
+                apiBaseUrl,
                 token,
-                fechaInicioParam,
-                fechaFinParam);
+                (fechaInicio != null) ? fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "",
+                (fechaFin != null) ? fechaFin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "");
+
         logger.info("-RestTemplate- URL: " + url);
         try {
             logger.info("-RestTemplate-    Procesando consulta de entrenamientos");
-            List<Entrenamiento> entrenamientos = restTemplate.postForObject(url, null, List.class);
-            return entrenamientos;
+            ParameterizedTypeReference<List<Entrenamiento>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<List<Entrenamiento>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, null,
+                    responseType);
+
+            return responseEntity.getBody();
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401:

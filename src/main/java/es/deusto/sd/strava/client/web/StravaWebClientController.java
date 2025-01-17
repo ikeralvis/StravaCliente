@@ -94,6 +94,7 @@ public class StravaWebClientController {
 		model.addAttribute("currentUrl", currentUrl); // Makes current URL available in all templates
 		model.addAttribute("token", token); // Makes token available in all templates
 	}
+
 	@GetMapping("/")
 	public String inicio(Model model) {
 		return "inicio";
@@ -112,29 +113,27 @@ public class StravaWebClientController {
 
 	@PostMapping("/registrarStrava")
 	public String performRegister(
-    @RequestParam("nombre") String nombre,
-    @RequestParam("email") String email,
-    @RequestParam(name = "peso", required = false) Float peso,
-    @RequestParam(name = "altura", required = false) Float altura,
-    @RequestParam(name = "fechaNacimiento") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaNacimiento,
-    @RequestParam(name = "frecuenciaCardiacaMax", required = false) Integer frecuenciaCardiacaMax,
-    @RequestParam(name = "frecuenciaCardiacaReposo", required = false) Integer frecuenciaCardiacaReposo,
-    @RequestParam("tipoLogin") String tipoLogin,
-    RedirectAttributes redirectAttributes,
-    Model model) {
-
+			@RequestParam("nombre") String nombre,
+			@RequestParam("email") String email,
+			@RequestParam(name = "peso", required = false) Float peso,
+			@RequestParam(name = "altura", required = false) Float altura,
+			@RequestParam(name = "fechaNacimiento") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaNacimiento,
+			@RequestParam(name = "frecuenciaCardiacaMax", required = false) Integer frecuenciaCardiacaMax,
+			@RequestParam(name = "frecuenciaCardiacaReposo", required = false) Integer frecuenciaCardiacaReposo,
+			@RequestParam("tipoLogin") String tipoLogin,
+			RedirectAttributes redirectAttributes,
+			Model model) {
 
 		try {
 			Usuario usuario = new Usuario(
-			nombre,
-			email,
-			peso,
-			altura,
-			fechaNacimiento,
-			frecuenciaCardiacaMax,
-			frecuenciaCardiacaReposo,
-			tipoLogin
-			);
+					nombre,
+					email,
+					peso,
+					altura,
+					fechaNacimiento,
+					frecuenciaCardiacaMax,
+					frecuenciaCardiacaReposo,
+					tipoLogin);
 			logger.info("-Controller-\tRegistrando usuario: " + usuario.toString());
 			stravaServiceProxy.registrar(usuario);
 
@@ -145,10 +144,10 @@ public class StravaWebClientController {
 			return "indexStrava";
 
 		} catch (RuntimeException e) {
-				logger.info("-Controller-    Registro fallido: " + e);
-				model.addAttribute("errorMessage", "Registro fallido: "+ e.getMessage());
-				return "registrarStrava";
-			}
+			logger.info("-Controller-    Registro fallido: " + e);
+			model.addAttribute("errorMessage", "Registro fallido: " + e.getMessage());
+			return "registrarStrava";
+		}
 	}
 
 	@GetMapping("/login")
@@ -166,11 +165,12 @@ public class StravaWebClientController {
 		Credentials credentials = new Credentials(email, password);
 
 		try {
-			logger.info("-Controller-	Las credenciales para hacer login son: email: " + credentials.email() + " password: "
+			logger.info("-Controller-	Las credenciales para hacer login son: email: " + credentials.email()
+					+ " password: "
 					+ credentials.password());
 			String tokenId = stravaServiceProxy.login(credentials);
 			logger.info("-Controller-\tEl token de la sesion es: " + tokenId);
-			token = tokenId; 
+			token = tokenId;
 			// Redirect to the original page or root if redirectUrl is null
 			return "indexStrava";
 		} catch (RuntimeException e) {
@@ -196,25 +196,27 @@ public class StravaWebClientController {
 
 	@GetMapping("/entrenamientos")
 	public String conseguirEntrenamientosUsuario(
-			@RequestParam(value = "startDate", required = false) LocalDate startDate,
-			@RequestParam(value = "endDate", required = false) LocalDate endDate,
+			@RequestParam(value = "fechaInicio", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fechaInicio,
+			@RequestParam(value = "fechaFin", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") LocalDate fechaFin,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 
-		if (!estaLogeado(token))
+		if (!estaLogeado(token)) {
+			logger.warn("-Controller-\tUsuario no logeado, redirigiendo a la página de login");
 			return "redirect:/login?redirectUrl=/usuarios/entrenamientos";
+		}
 
 		try {
 			// Llama al servicio proxy para obtener los entrenamientos del usuario
-			List<Entrenamiento> trainings = stravaServiceProxy.consultarEntrenamientos(token, startDate, endDate);
+			List<Entrenamiento> trainings = stravaServiceProxy.consultarEntrenamientos(token, fechaInicio, fechaFin);
 			// Agrega los entrenamientos al modelo para mostrarlos en la vista
 			model.addAttribute("trainings", trainings);
-			model.addAttribute("startDate", startDate);
-			model.addAttribute("endDate", endDate);
+			model.addAttribute("startDate", fechaInicio);
+			model.addAttribute("endDate", fechaFin);
 
-			return "entrenamientos"; 
+			return "entrenamientos";
 		} catch (RuntimeException e) {
-			e.printStackTrace();
+			logger.error("-Controller-\tError al obtener los entrenamientos: " + e.getMessage(), e);
 			redirectAttributes.addFlashAttribute("errorMessage",
 					"Error al obtener los entrenamientos: " + e.getMessage());
 			return "errorPage"; // Redirige a una página de error o a otra apropiada
@@ -244,24 +246,24 @@ public class StravaWebClientController {
 
 		}
 	}
+
 	@PostMapping("/retos")
 	public String anadirReto(
 			@RequestBody Reto reto,
-			RedirectAttributes redirectAttributes
-			) {
-			
-	    try {
-	        stravaServiceProxy.anadirReto(token, reto);
+			RedirectAttributes redirectAttributes) {
 
-	        // Redirigir con un mensaje de éxito
-	        redirectAttributes.addFlashAttribute("message", "Reto agregado exitosamente");
-	        return "redirect:/challenges"; // Redirigir a la página del usuario
+		try {
+			stravaServiceProxy.anadirReto(token, reto);
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el reto");
-	        return "errorPage"; // Redirigir a la página del usuario
-	    }			
+			// Redirigir con un mensaje de éxito
+			redirectAttributes.addFlashAttribute("message", "Reto agregado exitosamente");
+			return "redirect:/challenges"; // Redirigir a la página del usuario
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el reto");
+			return "errorPage"; // Redirigir a la página del usuario
+		}
 	}
 
 	public boolean estaLogeado(String token) {
