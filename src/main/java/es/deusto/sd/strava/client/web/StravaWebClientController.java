@@ -16,24 +16,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.HttpStatusCodeException;
+
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import es.deusto.sd.strava.client.data.Article;
-import es.deusto.sd.strava.client.data.Category;
 import es.deusto.sd.strava.client.data.Credentials;
 import es.deusto.sd.strava.client.data.Entrenamiento;
 import es.deusto.sd.strava.client.data.Reto;
-import es.deusto.sd.strava.client.data.TokenPorID;
 import es.deusto.sd.strava.client.data.Usuario;
-import es.deusto.sd.strava.client.proxies.IAuctionsServiceProxy;
 import es.deusto.sd.strava.client.proxies.IStravaServiceProxy;
-import es.deusto.sd.strava.client.proxies.StravaRestTemplateServiceProxy;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
