@@ -3,6 +3,7 @@ package es.deusto.sd.strava.client.proxies;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
@@ -106,16 +107,25 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
 
     @Override
     public List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin) {
-        // Construir la URL con los parámetros
-        String url = String.format("%s/api/entrenamientos/?token=%s%s%s",
-                apiBaseUrl,
+        // Formatear las fechas si no son nulas
+        String fechaInicioParam = (fechaInicio != null) ? fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                : null;
+        String fechaFinParam = (fechaFin != null) ? fechaFin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null;
+
+        // Construir la URL con String.format en el formato esperado
+        String url = String.format(
+                "%s/api/entrenamientos/%s/%s?token=%s&fechaInicio=%s&fechaFin=%s",
+                apiBaseUrl, // Base URL del servidor
+                fechaInicioParam,
+                fechaFinParam,
                 token,
-                fechaInicio != null ? "&fechaInicio=" + fechaInicio : "",
-                fechaFin != null ? "&fechaFin=" + fechaFin : "");
+                fechaInicioParam,
+                fechaFinParam);
         logger.info("-RestTemplate- URL: " + url);
         try {
             logger.info("-RestTemplate-    Procesando consulta de entrenamientos");
-            return restTemplate.getForObject(url, List.class);
+            List<Entrenamiento> entrenamientos = restTemplate.postForObject(url, null, List.class);
+        return entrenamientos;
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401:
@@ -130,8 +140,8 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
 
     @Override
     public void anadirEntrenamiento(String token, Entrenamiento entrenamiento) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'anadirEntrenamiento'");
+        // String url = String.format("%s/api/entrenamientos?token=%s", apiBaseUrl,
+        // token);
     }
 
     @Override
