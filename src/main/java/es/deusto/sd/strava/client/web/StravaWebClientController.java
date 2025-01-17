@@ -248,8 +248,7 @@ public class StravaWebClientController {
 
 		}
 	}
-
-	@PostMapping("/retos")
+	@PostMapping("/reto")
 	public String anadirReto(
 			@RequestBody Reto reto,
 			RedirectAttributes redirectAttributes) {
@@ -274,4 +273,35 @@ public class StravaWebClientController {
 		}
 		return false;
 	}
+
+	@GetMapping("/retos")
+	public String obtenerRetos(
+			@RequestParam(value = "startDate", required = false) LocalDate startDate,
+			@RequestParam(value = "endDate", required = false) LocalDate endDate,
+			@RequestParam(value = "sport", required = false) String sport,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+
+		if (!estaLogeado(token))
+			return "redirect:/login?redirectUrl=/usuarios/retos";
+
+		try {
+			// Llama al servicio proxy para obtener los retos del usuario
+			List<Reto> retos = stravaServiceProxy.consultarRetos(token, startDate, endDate, sport);
+			// Agrega los retos al modelo para mostrarlos en la vista
+			model.addAttribute("challenges", retos);
+			model.addAttribute("startDate", startDate);
+			model.addAttribute("endDate", endDate);
+			model.addAttribute("sport", sport);
+
+			return "retos"; 
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			redirectAttributes.addFlashAttribute("errorMessage",
+					"Error al obtener los retos: " + e.getMessage());
+			return "errorPage"; // Redirige a una página de error o a otra apropiada
+		}
+
+	}
+
 }
