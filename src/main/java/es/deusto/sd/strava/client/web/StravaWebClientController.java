@@ -14,13 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -230,41 +232,42 @@ public class StravaWebClientController {
 
 	}
 
-
 	@PostMapping("/anadirEntrenamientos")
 	public String anadirEntrenamientos(
-		@RequestParam("titulo") String titulo,
-        @RequestParam("deporte") String deporte,
-        @RequestParam("distancia") String distanciaStr,
-        @RequestParam("fechaInicio") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaInicio,
-        @RequestParam("horaInicio") String horaInicio,
-        @RequestParam("duracion") int duracion,
-        Model model,
-        RedirectAttributes redirectAttributes) {
-			if (!estaLogeado(token)) {
-				logger.warn("-Controller-\tUsuario no logeado, redirigiendo a la página de login");
-				return "redirect:/login?redirectUrl=/entrenamientos";
-			}
-			float distancia = 0;
-			try {
-				distancia = Float.parseFloat(distanciaStr.replace(",", "."));
-
-				logger.info("-Controller-\tCreando entrenamiento: " + titulo + " " + deporte + " " + distancia + " " + duracion + " " + fechaInicio + " " + horaInicio);
-				// Llamar al proxy para crear el entrenamiento
-				stravaServiceProxy.anadirEntrenamiento(token, titulo, deporte, distancia, duracion, fechaInicio, horaInicio);
-		
-				redirectAttributes.addFlashAttribute("successMessage", "Entrenamiento creado con éxito");
-				return "redirect:/entrenamientos"; // Redirige a la lista de entrenamientos
-			} catch (NumberFormatException er) {
-				logger.error("-Controller-\tError al crear entrenamiento: " + er.getMessage(), er);
-				redirectAttributes.addFlashAttribute("errorMessage", "Error al crear el entrenamiento: " + er.getMessage());
-				return "redirect:/entrenamientos";
-			} catch (RuntimeException e) {
-				logger.error("-Controller-\tError al crear entrenamiento: " + e.getMessage(), e);
-				redirectAttributes.addFlashAttribute("errorMessage", "Error al crear el entrenamiento: " + e.getMessage());
-				return "redirect:/entrenamientos";
-			}
+			@RequestParam("titulo") String titulo,
+			@RequestParam("deporte") String deporte,
+			@RequestParam("distancia") String distanciaStr,
+			@RequestParam("fechaInicio") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaInicio,
+			@RequestParam("horaInicio") String horaInicio,
+			@RequestParam("duracion") int duracion,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+		if (!estaLogeado(token)) {
+			logger.warn("-Controller-\tUsuario no logeado, redirigiendo a la página de login");
+			return "redirect:/login?redirectUrl=/entrenamientos";
 		}
+		float distancia = 0;
+		try {
+			distancia = Float.parseFloat(distanciaStr.replace(",", "."));
+
+			logger.info("-Controller-\tCreando entrenamiento: " + titulo + " " + deporte + " " + distancia + " "
+					+ duracion + " " + fechaInicio + " " + horaInicio);
+			// Llamar al proxy para crear el entrenamiento
+			stravaServiceProxy.anadirEntrenamiento(token, titulo, deporte, distancia, duracion, fechaInicio,
+					horaInicio);
+
+			redirectAttributes.addFlashAttribute("successMessage", "Entrenamiento creado con éxito");
+			return "redirect:/entrenamientos"; // Redirige a la lista de entrenamientos
+		} catch (NumberFormatException er) {
+			logger.error("-Controller-\tError al crear entrenamiento: " + er.getMessage(), er);
+			redirectAttributes.addFlashAttribute("errorMessage", "Error al crear el entrenamiento: " + er.getMessage());
+			return "redirect:/entrenamientos";
+		} catch (RuntimeException e) {
+			logger.error("-Controller-\tError al crear entrenamiento: " + e.getMessage(), e);
+			redirectAttributes.addFlashAttribute("errorMessage", "Error al crear el entrenamiento: " + e.getMessage());
+			return "redirect:/entrenamientos";
+		}
+	}
 
 	@PostMapping("/reto")
 	public String anadirReto(
@@ -332,4 +335,29 @@ public class StravaWebClientController {
 
 	}
 
+	@PostMapping("/retos/aceptar")
+	public String aceptarReto(
+			@RequestParam("nombreR") String nombreReto,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+
+		if (!estaLogeado(token)) {
+			return "redirect:/login?redirectUrl=/retos";
+		}
+
+		try {
+			// Llama al método del proxy para aceptar el reto
+			stravaServiceProxy.aceptarReto(nombreReto, token);
+
+			// Mensaje de éxito
+			redirectAttributes.addFlashAttribute("successMessage", "Has aceptado el reto: " + nombreReto);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			// Mensaje de error
+			redirectAttributes.addFlashAttribute("errorMessage", "Error al aceptar el reto: " + e.getMessage());
+		}
+
+		// Redirige de vuelta a la página de retos
+		return "redirect:/retos";
+	}
 }

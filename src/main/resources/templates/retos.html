@@ -70,6 +70,20 @@
                 </tbody>
             </table>
         </div>
+        <!-- Apartado para aceptar retos -->
+        <h2 class="mt-5">Reto a Aceptar</h2>
+        <div>
+            <p th:if="${retoSeleccionado != null}">
+                Has seleccionado el reto: <strong th:text="${retoSeleccionado.nombre}"></strong>.
+            </p>
+            <form th:action="@{/retos/aceptar}" method="post" class="mt-3">
+                <input type="hidden" name="retoId" th:value="${retoSeleccionado.id}" />
+                <select name="nombreR" class="form-select" required>
+                    <option th:each="reto : ${retos}" th:value="${reto.nombre}" th:text="${reto.nombre}"></option>
+                </select>
+                <button type="submit" class="btn btn-success">Aceptar Reto</button>
+            </form>
+        </div>
 
         <!-- Formulario para añadir retos -->
         <h2 class="mt-5">Añadir Reto</h2>
