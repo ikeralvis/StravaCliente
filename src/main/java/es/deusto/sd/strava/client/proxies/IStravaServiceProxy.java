@@ -7,12 +7,10 @@ package es.deusto.sd.strava.client.proxies;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import es.deusto.sd.strava.client.data.Credentials;
 import es.deusto.sd.strava.client.data.Entrenamiento;
 import es.deusto.sd.strava.client.data.Reto;
-import es.deusto.sd.strava.client.data.TokenPorID;
 import es.deusto.sd.strava.client.data.Usuario;
 
 
