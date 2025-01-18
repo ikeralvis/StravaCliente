@@ -4,7 +4,7 @@ public record Reto(
 		String nombre,
 		long fechaInicio,
 		long fechaFin,
-		double objetivo,
-		String tipoObjetivo,
+		float objetivoDistancia,
+		int objetivoTiempo,
 		String deporte
 	) {}
