@@ -52,7 +52,7 @@ public interface IStravaServiceProxy {
 	String login(Credentials credenciales);
 
 	List<Entrenamiento> consultarEntrenamientos(String token, LocalDate fechaInicio, LocalDate fechaFin);
-	void anadirEntrenamiento(String token, Entrenamiento entrenamiento);
+	void anadirEntrenamiento(String token, String titulo, String deporte, float distancia, int duracion, LocalDate fechaInicio, String horaInicio);
 	void anadirReto(String token, Reto reto);
 
 	List<Reto> consultarRetosActivos();

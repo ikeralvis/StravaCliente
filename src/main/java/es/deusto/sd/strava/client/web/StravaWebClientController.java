@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -208,8 +210,10 @@ public class StravaWebClientController {
 
 		try {
 			// Llama al servicio proxy para obtener los entrenamientos del usuario
-			List<Entrenamiento> entrenamientos = stravaServiceProxy.consultarEntrenamientos(token, fechaInicio, fechaFin);
-			logger.info("-Controller-\tEntrenamientos obtenidos: " + entrenamientos.size() + " entrenamientos encontrados");
+			List<Entrenamiento> entrenamientos = stravaServiceProxy.consultarEntrenamientos(token, fechaInicio,
+					fechaFin);
+			logger.info(
+					"-Controller-\tEntrenamientos obtenidos: " + entrenamientos.size() + " entrenamientos encontrados");
 			model.addAttribute("entrenamientos", entrenamientos);
 			// Agrega los entrenamientos al modelo para mostrarlos en la vista
 			model.addAttribute("entrenamientos", entrenamientos);
@@ -226,28 +230,42 @@ public class StravaWebClientController {
 
 	}
 
+
 	@PostMapping("/anadirEntrenamientos")
 	public String anadirEntrenamientos(
-			@RequestBody Entrenamiento entrenamiento,
-			RedirectAttributes redirectAttributes) {
-		try {
-			// Llamada al servicio para agregar el entrenamiento
-			logger.info("-Controller-\tAñadiendo entrenamiento: " + entrenamiento.toString() + " con token: " + token);
-			stravaServiceProxy.anadirEntrenamiento(token, entrenamiento);
-			logger.info("-Controller-\tEntrenamiento añadido exitosamente");
+		@RequestParam("titulo") String titulo,
+        @RequestParam("deporte") String deporte,
+        @RequestParam("distancia") String distanciaStr,
+        @RequestParam("fechaInicio") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaInicio,
+        @RequestParam("horaInicio") String horaInicio,
+        @RequestParam("duracion") int duracion,
+        Model model,
+        RedirectAttributes redirectAttributes) {
+			if (!estaLogeado(token)) {
+				logger.warn("-Controller-\tUsuario no logeado, redirigiendo a la página de login");
+				return "redirect:/login?redirectUrl=/entrenamientos";
+			}
+			float distancia = 0;
+			try {
+				distancia = Float.parseFloat(distanciaStr.replace(",", "."));
 
-			// Redirigir con un mensaje de éxito
-			redirectAttributes.addFlashAttribute("message", "Entrenamiento agregado exitosamente");
-			return "redirect:/entrenamientos"; // Redirigir a la página del usuario
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el entrenamiento");
-
-			return "errorPage"; // Redirigir a la página del usuario
-
+				logger.info("-Controller-\tCreando entrenamiento: " + titulo + " " + deporte + " " + distancia + " " + duracion + " " + fechaInicio + " " + horaInicio);
+				// Llamar al proxy para crear el entrenamiento
+				stravaServiceProxy.anadirEntrenamiento(token, titulo, deporte, distancia, duracion, fechaInicio, horaInicio);
+		
+				redirectAttributes.addFlashAttribute("successMessage", "Entrenamiento creado con éxito");
+				return "redirect:/entrenamientos"; // Redirige a la lista de entrenamientos
+			} catch (NumberFormatException er) {
+				logger.error("-Controller-\tError al crear entrenamiento: " + er.getMessage(), er);
+				redirectAttributes.addFlashAttribute("errorMessage", "Error al crear el entrenamiento: " + er.getMessage());
+				return "redirect:/entrenamientos";
+			} catch (RuntimeException e) {
+				logger.error("-Controller-\tError al crear entrenamiento: " + e.getMessage(), e);
+				redirectAttributes.addFlashAttribute("errorMessage", "Error al crear el entrenamiento: " + e.getMessage());
+				return "redirect:/entrenamientos";
+			}
 		}
-	}
+
 	@PostMapping("/reto")
 	public String anadirReto(
 			@RequestBody Reto reto,
@@ -294,7 +312,7 @@ public class StravaWebClientController {
 			model.addAttribute("endDate", endDate);
 			model.addAttribute("sport", sport);
 
-			return "retos"; 
+			return "retos";
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			redirectAttributes.addFlashAttribute("errorMessage",

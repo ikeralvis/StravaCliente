@@ -1,5 +1,6 @@
 package es.deusto.sd.strava.client.proxies;
 
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.web.util.UriUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,9 +150,32 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     }
 
     @Override
-    public void anadirEntrenamiento(String token, Entrenamiento entrenamiento) {
-        // String url = String.format("%s/api/entrenamientos?token=%s", apiBaseUrl,
-        // token);
+    public void anadirEntrenamiento(String token, String titulo, String deporte, float distancia, int duracion,
+            LocalDate fechaInicio, String horaInicio) {
+        String url = String.format(
+                "%s/api/entrenamiento?titulo=%s&deporte=%s&distancia=%%s&duracion=%d&fechaInicio=%s&horaInicio=%s&token=%s",
+                apiBaseUrl,
+                titulo,
+                deporte,
+                String.format("%.2f", distancia),
+                duracion,
+                fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                horaInicio,
+                token);
+        try {
+            logger.info("-Proxy- Enviando solicitud para crear entrenamiento: " + url);
+            restTemplate.postForEntity(url, null, String.class);
+            logger.info("-Proxy- Entrenamiento creado exitosamente.");
+        } catch (HttpStatusCodeException e) {
+            switch (e.getStatusCode().value()) {
+                case 401:
+                    logger.error("-Proxy- Token inválido");
+                    throw new RuntimeException("Token inválido");
+                default:
+                    logger.error("-Proxy- Error al crear entrenamiento: " + e.getStatusCode().value());
+                    throw new RuntimeException("Error al crear entrenamiento: " + e.getStatusCode().value());
+            }
+        }
     }
 
     @Override
@@ -207,7 +231,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     }
 
     @Override
-    public List<Reto> consultarRetosActivosFiltrados( String token, LocalDate fechaFin, String deporte) {
+    public List<Reto> consultarRetosActivosFiltrados(String token, LocalDate fechaFin, String deporte) {
         // Construir la URL con String.format en el formato esperado
         String url = String.format("%s/api/retos", apiBaseUrl);
         logger.info("-RestTemplate- URL: " + url);
