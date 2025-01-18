@@ -274,4 +274,26 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
             }
         }
     }
+   
+    @Override
+    public List<Reto> retosAceptados(String token) {
+        // Construir la URL con String.format en el formato esperado
+        String url = String.format("%s/api/retosAceptados?token=%s", apiBaseUrl, token);
+        logger.info("-RestTemplate- URL retosAceptados " + url);
+        try {
+            logger.info("-RestTemplate-    Procesando consulta de retos sin filtrar");
+            List<Reto> retosAceptados = restTemplate.getForObject(url, List.class);
+            logger.info("-RestTemplate-    Retos Aceptados: " + retosAceptados);
+            return retosAceptados;
+        } catch (HttpStatusCodeException e) {
+            switch (e.getStatusCode().value()) {
+                case 401:
+                    logger.error("-RestTemplate-    Token inválido");
+                    throw new RuntimeException("Token inválido");
+                default:
+                    logger.error("-RestTemplate-    Consulta de retos fallida: " + e.getStatusCode().value());
+                    throw new RuntimeException("Consulta de retos fallida: " + e.getStatusCode().value());
+            }
+        }
+    }
 }

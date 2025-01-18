@@ -59,6 +59,6 @@ public interface IStravaServiceProxy {
 	List<Reto> consultarRetosActivos();
 	List<Reto> consultarRetosActivosFiltrados(String token, LocalDate fechaFin, String deporte);	
 	String aceptarReto(String nombreReto, String token);
-	//Map<Integer, Double> consultarRetosUsuario(String token);
+	List<Reto> retosAceptados(String token);
 	
 }

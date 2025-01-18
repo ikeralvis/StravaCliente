@@ -319,8 +319,10 @@ public class StravaWebClientController {
 		try {
 			// Llama al servicio proxy para obtener los retos del usuario
 			List<Reto> retos = stravaServiceProxy.consultarRetosActivos();
+			List<Reto> retosAceptados = stravaServiceProxy.retosAceptados(token);
 			// Agrega los retos al modelo para mostrarlos en la vista
 			model.addAttribute("retos", retos);
+			model.addAttribute("retosAceptados", retosAceptados);
 
 			return "retos";
 		} catch (RuntimeException e) {
@@ -334,7 +336,7 @@ public class StravaWebClientController {
 
 	@PostMapping("/retos/aceptar")
 	public String aceptarReto(
-			@RequestParam("nombreR") String nombreReto,
+			@RequestParam("retoNombre") String retoNombre,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 
@@ -344,10 +346,8 @@ public class StravaWebClientController {
 
 		try {
 			// Llama al método del proxy para aceptar el reto
-			stravaServiceProxy.aceptarReto(nombreReto, token);
+			stravaServiceProxy.aceptarReto(retoNombre, token);
 
-			// Mensaje de éxito
-			redirectAttributes.addFlashAttribute("successMessage", "Has aceptado el reto: " + nombreReto);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 			// Mensaje de error
