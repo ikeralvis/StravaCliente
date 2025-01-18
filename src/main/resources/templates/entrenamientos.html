@@ -20,12 +20,21 @@
     </header>
 
     <!-- Navigation bar -->
-    <nav class="navbar navbar-light bg-light shadow-sm">
-	    <div class="container-fluid d-flex align-items-center">
-	        <!-- Back button -->
-	        <a href="/index" class="btn btn-secondary btn-sm d-flex align-items-center">
-	            <i class="fas fa-arrow-left me-2"></i> Volver
-	        </a>
+	<nav class="navbar navbar-light bg-light shadow-sm">
+		<div class="container">
+			 <!-- Links de navegacion -->
+			 <a href="" class="btn btn-dark fw-bold me-2">Principal</a>
+			 <a href="/entrenamientos" class="btn btn-dark fw-bold me-2">Mis entrenamientos</a>
+			 <a href="/retos" class="btn btn-dark fw-bold me-2">Retos</a>
+
+	        <!-- Logout button -->
+	        <div class="ms-auto">
+	            	<a th:if="${token != null}" th:href="@{/logout(redirectUrl=${currentUrl})}" 
+	               	class="btn btn-danger btn-sm d-flex align-items-center ms-2">
+	                <i class="fas fa-sign-out-alt me-2"></i> Logout
+	            	</a>
+				</div>
+	        </div>
 	    </div>
 	</nav>
     <div class="container mt-5">
@@ -73,6 +82,7 @@
                     <td th:text="${entrenamiento.titulo}"></td>
                     <td th:text="${entrenamiento.deporte}"></td>
                     <td th:text="${#numbers.formatDecimal(entrenamiento.distancia, 0, 2, 'POINT')}"></td>
+                    <td th:text="${entrenamiento.fechaInicio}"></td>
                     <td th:text="${entrenamiento.horaInicio}" th:if="${entrenamiento.horaInicio != null}"></td>
                     <td th:text="${entrenamiento.duracion}"></td>
                 </tr>

@@ -153,35 +153,58 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     public void anadirEntrenamiento(String token, String titulo, String deporte, float distancia, int duracion,
             LocalDate fechaInicio, String horaInicio) {
         String url = String.format(
-                "%s/api/entrenamiento?titulo=%s&deporte=%s&distancia=%%s&duracion=%d&fechaInicio=%s&horaInicio=%s&token=%s",
+                "%s/api/entrenamiento?titulo=%s&deporte=%s&distancia=%s&duracion=%d&fechaInicio=%s&horaInicio=%s&token=%s",
                 apiBaseUrl,
                 titulo,
                 deporte,
-                String.format("%.2f", distancia),
+                distancia,
                 duracion,
                 fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                 horaInicio,
                 token);
         try {
-            logger.info("-Proxy- Enviando solicitud para crear entrenamiento: " + url);
+            logger.info("-RestTemplate- Enviando solicitud para crear entrenamiento: " + url);
+            logger.info("Esta es la : "+ String.format("%.2f", distancia));
             restTemplate.postForEntity(url, null, String.class);
-            logger.info("-Proxy- Entrenamiento creado exitosamente.");
+            logger.info("-RestTemplate- Entrenamiento creado exitosamente.");
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401:
-                    logger.error("-Proxy- Token inválido");
+                    logger.error("-RestTemplate- Token inválido");
                     throw new RuntimeException("Token inválido");
                 default:
-                    logger.error("-Proxy- Error al crear entrenamiento: " + e.getStatusCode().value());
+                    logger.error("-RestTemplate- Error al crear entrenamiento: " + e.getStatusCode().value());
                     throw new RuntimeException("Error al crear entrenamiento: " + e.getStatusCode().value());
             }
         }
     }
 
     @Override
-    public void anadirReto(String token, Reto reto) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'anadirReto'");
+    public void anadirReto(String token, String nombre, String deporte, float objetivoDistancia, int objetivoTiempo,
+            LocalDate fechaInicio, LocalDate fechaFin) {
+        String url = String.format("%s/api/reto?nombre=%s&deporte=%s&objetivoDistancia=%s&objetivoTiempo=%s&fechaInicio=%s&fechaFin=%s",
+                apiBaseUrl,
+                nombre,
+                deporte,
+                objetivoDistancia,
+                objetivoTiempo,
+                fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                fechaFin.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+            );
+        try {
+            logger.info("-RestTemplate- Enviando solicitud para crear reto: " + url);
+            restTemplate.postForEntity(url, token, String.class);
+            logger.info("-RestTemplate- Reto creado exitosamente.");
+        } catch (HttpStatusCodeException e) {
+            switch (e.getStatusCode().value()) {
+                case 401:
+                    logger.error("-RestTemplate- Token inválido");
+                    throw new RuntimeException("Token inválido");
+                default:
+                    logger.error("-RestTemplate- Error al crear reto: " + e.getStatusCode().value());
+                    throw new RuntimeException("Error al crear reto: " + e.getStatusCode().value());
+            }
+        }
     }
 
     @Override

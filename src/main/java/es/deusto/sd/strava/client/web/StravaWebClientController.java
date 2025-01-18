@@ -268,15 +268,25 @@ public class StravaWebClientController {
 
 	@PostMapping("/reto")
 	public String anadirReto(
-			@RequestBody Reto reto,
+			@RequestParam("nombre") String nombre,
+			@RequestParam("deporte") String deporte,
+			@RequestParam("objetivoDistancia") float objetivoDistancia,
+			@RequestParam("objetivoTiempo") int objetivoTiempo,
+			@RequestParam("fechaInicio") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaInicio,
+			@RequestParam("fechaFin") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fechaFin,
+			Model model,
+
 			RedirectAttributes redirectAttributes) {
 
 		try {
-			stravaServiceProxy.anadirReto(token, reto);
-
+			logger.info("-Controller-\tAgregando reto: " + nombre + " " + deporte + " " + objetivoDistancia + " "
+					+ objetivoTiempo + " " + fechaInicio + " " + fechaFin);
+			stravaServiceProxy.anadirReto(token, nombre, deporte, objetivoDistancia, objetivoTiempo, fechaInicio,
+					fechaFin);
+			logger.info("-Controller-\tReto agregado exitosamente");
 			// Redirigir con un mensaje de éxito
 			redirectAttributes.addFlashAttribute("message", "Reto agregado exitosamente");
-			return "redirect:/challenges"; // Redirigir a la página del usuario
+			return "redirect:/retos"; // Redirigir a la página del usuario
 
 		} catch (Exception e) {
 			e.printStackTrace();
