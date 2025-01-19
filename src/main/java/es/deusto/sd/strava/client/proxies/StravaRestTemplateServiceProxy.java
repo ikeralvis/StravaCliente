@@ -1,6 +1,5 @@
 package es.deusto.sd.strava.client.proxies;
 
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -16,11 +15,9 @@ import es.deusto.sd.strava.client.data.Usuario;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,6 +235,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
         logger.info("-RestTemplate- URL: " + url);
         try {
             logger.info("-RestTemplate-    Procesando consulta de retos sin filtrar");
+            @SuppressWarnings("unchecked")
             List<Reto> retos = restTemplate.getForObject(url, List.class);
             logger.info("-RestTemplate-    Retos: " + retos);
             return retos;
@@ -265,6 +263,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
         logger.info("-RestTemplate- URL para retos Filtrados: " + url);
         try {
             logger.info("-RestTemplate-    Procesando consulta de retos filtrados");
+            @SuppressWarnings("unchecked")
             List<Reto> retos = restTemplate.getForObject(url, List.class);
             logger.info("-RestTemplate-    Retos: " + retos);
             return retos;
@@ -287,6 +286,7 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
         logger.info("-RestTemplate- URL retosAceptados " + url);
         try {
             logger.info("-RestTemplate-    Procesando consulta de retos sin filtrar");
+            @SuppressWarnings("unchecked")
             List<Reto> retosAceptados = restTemplate.getForObject(url, List.class);
             logger.info("-RestTemplate-    Retos Aceptados: " + retosAceptados);
             return retosAceptados;
