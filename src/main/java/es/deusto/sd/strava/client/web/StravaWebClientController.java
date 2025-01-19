@@ -301,9 +301,8 @@ public class StravaWebClientController {
 
 	@GetMapping("/retos")
 	public String obtenerRetos(
-			@RequestParam(value = "startDate", required = false) LocalDate startDate,
-			@RequestParam(value = "endDate", required = false) LocalDate endDate,
-			@RequestParam(value = "sport", required = false) String sport,
+			@RequestParam(value = "fechaFin", required = false) LocalDate fechaFin,
+			@RequestParam(value = "deporte", required = false) String deporte,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 
@@ -311,12 +310,23 @@ public class StravaWebClientController {
 			return "redirect:/login?redirectUrl=/usuarios/retos";
 
 		try {
+			if(deporte != null) {
+				logger.info("-Controller-\tObteniendo retos filtrados por deporte: " + deporte);
+				// Llama al servicio proxy para obtener los retos del usuario
+				List<Reto> retosFiltrados = stravaServiceProxy.consultarRetosActivosFiltrados(token, fechaFin, deporte);
+				List<Reto> retosAceptados = stravaServiceProxy.retosAceptados(token);
+				// Agrega los retos al modelo para mostrarlos en la vista
+				model.addAttribute("retos", retosFiltrados);
+				model.addAttribute("retosAceptados", retosAceptados);
+			}else{
 			// Llama al servicio proxy para obtener los retos del usuario
+			logger.info("-Controller-\tObteniendo retos");
 			List<Reto> retos = stravaServiceProxy.consultarRetosActivos();
 			List<Reto> retosAceptados = stravaServiceProxy.retosAceptados(token);
 			// Agrega los retos al modelo para mostrarlos en la vista
 			model.addAttribute("retos", retos);
 			model.addAttribute("retosAceptados", retosAceptados);
+			}
 
 			return "retos";
 		} catch (RuntimeException e) {
