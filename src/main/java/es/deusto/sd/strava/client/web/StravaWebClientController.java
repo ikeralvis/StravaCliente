@@ -139,7 +139,7 @@ public class StravaWebClientController {
 			// entrenamiento del usuario
 			redirectAttributes.addFlashAttribute("message", "Usuario registrado exitosamente");
 			logger.info("-Controller-\tUsuario registrado exitosamente");
-			return "indexStrava";
+			return "inicio"; // Redirige a la página de inicio
 
 		} catch (RuntimeException e) {
 			logger.info("-Controller-    Registro fallido: " + e);
@@ -301,7 +301,7 @@ public class StravaWebClientController {
 
 	@GetMapping("/retos")
 	public String obtenerRetos(
-			@RequestParam(value = "fechaFin", required = false) LocalDate fechaFin,
+			@RequestParam(value = "fechaInicio", required = false) LocalDate fechaInicio,
 			@RequestParam(value = "deporte", required = false) String deporte,
 			Model model,
 			RedirectAttributes redirectAttributes) {
@@ -313,7 +313,7 @@ public class StravaWebClientController {
 			if(deporte != null) {
 				logger.info("-Controller-\tObteniendo retos filtrados por deporte: " + deporte);
 				// Llama al servicio proxy para obtener los retos del usuario
-				List<Reto> retosFiltrados = stravaServiceProxy.consultarRetosActivosFiltrados(token, fechaFin, deporte);
+				List<Reto> retosFiltrados = stravaServiceProxy.consultarRetosActivosFiltrados(token, fechaInicio, deporte);
 				List<Reto> retosAceptados = stravaServiceProxy.retosAceptados(token);
 				// Agrega los retos al modelo para mostrarlos en la vista
 				model.addAttribute("retos", retosFiltrados);

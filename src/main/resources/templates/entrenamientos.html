@@ -50,16 +50,17 @@
                 <div class="col-md-6">
                     <label class="form-label text-dark">Fecha de Inicio:</label>
                     <input type="date" id="fechaInicio" name="fechaInicio" class="form-control"
-                        th:value="${fechaInicio}">
+                        th:value="${fechaInicio}" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label text-dark">Fecha de Fin:</label>
                     <input type="date" id="fechaFin" name="fechaFin" class="form-control"
-                        th:value="${fechaFin}">
+                        th:value="${fechaFin}" required>
                 </div>
             </div>
             <button type="submit" class="btn btn-success fw-bold mt-3 w-100">Filtrar</button>
         </form>
+
 
         <!-- Tabla de Entrenamientos -->
         <table class="table table-dark table-striped">

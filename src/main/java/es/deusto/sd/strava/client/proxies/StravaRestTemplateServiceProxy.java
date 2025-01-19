@@ -254,9 +254,14 @@ public class StravaRestTemplateServiceProxy implements IStravaServiceProxy {
     }
 
     @Override
-    public List<Reto> consultarRetosActivosFiltrados(String token, LocalDate fechaFin, String deporte) {
+    public List<Reto> consultarRetosActivosFiltrados(String token, LocalDate fechaInicio, String deporte) {
         // Construir la URL con String.format en el formato esperado
-        String url = String.format("%s/api/retos?deporte=%s", apiBaseUrl, deporte);
+        if (fechaInicio == null) {
+            fechaInicio = LocalDate.now();
+        }
+        String fechaFormateada = fechaInicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String url = String.format("%s/api/retos?fecha=%s&deporte=%s", apiBaseUrl, fechaFormateada, deporte); 
+
         logger.info("-RestTemplate- URL para retos Filtrados: " + url);
         try {
             logger.info("-RestTemplate-    Procesando consulta de retos filtrados");
